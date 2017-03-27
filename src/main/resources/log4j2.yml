@@ -1,0 +1,62 @@
+Configutation:
+  name: Default
+ 
+  Properties:
+    Property:
+      name: log-path
+      value: "logs"
+ 
+  Appenders:
+ 
+    Console:
+      name: Console_Appender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "[%-5level] [%d{yyyy-MM-dd HH:mm:ss.SSS}]  %-30.30c{1} - %msg%n"
+ 
+    RollingFile:
+      - name: App_RollingFile_Appender
+        fileName: ${log-path}/app-log.log
+        filePattern: "logs/archive/app-log-%i.log"
+        PatternLayout:
+          pattern: "[%-5level] [%d{yyyy-MM-dd HH:mm:ss.SSS}]  %-30.30c{1} - %msg%n"
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 10 MB
+        DefaultRollOverStrategy:
+          max: 10
+      - name: Spring_RollingFile_Appender
+        fileName: ${log-path}/spring-log.log
+        filePattern: "logs/archive/spring-log-%i.log"
+        PatternLayout:
+          pattern: "[%-5level] [%d{yyyy-MM-dd HH:mm:ss.SSS}]  %-30.30c{1} - %msg%n"
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 10 MB
+        DefaultRollOverStrategy:
+          max: 10
+ 
+  Loggers:
+ 
+      Root:
+        level: info
+        AppenderRef:
+          - ref: Console_Appender
+ 
+      Logger:
+        - name: onlinejudge
+          additivity: false
+          level: debug
+          AppenderRef:
+            - ref: Console_Appender
+              level: debug
+            - ref: App_RollingFile_Appender
+              level: debug
+        - name: org.springframework.web
+          additivity: false
+          level: info
+          AppenderRef:
+            - ref: Console_Appender
+              level: info
+            - ref: Spring_RollingFile_Appender
+              level: debug

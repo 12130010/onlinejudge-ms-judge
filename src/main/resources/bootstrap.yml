@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: onlinejudge-ms-judge
+  cloud:
+    config:
+      uri: http://127.0.0.1:8888
+      fail-fast: true
+      password: ${CONFIG_SERVICE_PASSWORD:passwordConfigServer}
+      username: user
+security:
+  oauth2:
+    client:
+      clientId: judgeService
+      clientSecret: judgeService@password
+      accessTokenUri: ${oauth2.client.accessTokenUri}
+      grant-type: client_credentials
+    resource:
+      user-info-uri: ${oauth2.resource.user-info-uri}
+      
