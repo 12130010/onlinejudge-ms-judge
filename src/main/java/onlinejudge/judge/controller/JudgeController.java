@@ -38,8 +38,7 @@ public class JudgeController {
 	JudgeService judgeService;
 	
 	@RequestMapping(value = { "/submit" }, method = RequestMethod.POST)
-	public @ResponseBody Submit submit(MultipartHttpServletRequest request, Model model)
-			throws IOException, InterruptedException {
+	public @ResponseBody Submit submit(MultipartHttpServletRequest request, Model model) throws Exception {
 		Submit submit = new Submit();
 		
 		MultipartFile file = request.getFile("file");
@@ -47,11 +46,23 @@ public class JudgeController {
 		
 		long idSubmit = System.currentTimeMillis();
 		String filePath = submitRootPath + "/" + idSubmit + "/" + file.getOriginalFilename();
-		FileUtils.writeByteArrayToFile(new File(filePath), file.getBytes());
+		
+		try {
+			logger.debug("Store file to local is starting...");
+			FileUtils.writeByteArrayToFile(new File(filePath), file.getBytes()); //store local
+			logger.debug("Store file to local is completed");
+			logger.debug("Store file to resource is starting...");
+			judgeService.uploadSubmitFileToResourceServer(idSubmit + "/" + file.getOriginalFilename(), file.getBytes()); // store to resource server
+			logger.debug("Store file to resource server is completed");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			throw e;
+		}
 		
 		//add Submit to ProblemForTeam
 		submit.setDateSubmit(new Date());
-		submit.setFilePath(filePath);
+		submit.setFilePath(idSubmit + "/" + file.getOriginalFilename());
 		submit.setIdContest(request.getParameter("idContest"));
 		submit.setIdTeam(request.getParameter("idTeam"));
 		submit.setIdProblemForTeam(request.getParameter("idProblemForTeam"));

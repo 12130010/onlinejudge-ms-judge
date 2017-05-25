@@ -16,6 +16,7 @@ import onlinejudge.contest.client.SubmitClient;
 import onlinejudge.domain.Problem;
 import onlinejudge.domain.Submit;
 import onlinejudge.domain.TestCase;
+import onlinejudge.dto.MyResponse;
 import onlinejudge.file.dto.GroupResource;
 import onlinejudge.file.dto.MyResource;
 
@@ -57,5 +58,17 @@ public class JudgeService {
 				FileUtils.copyInputStreamToFile(resource.inputStream(),new File(dataRootPath + "/" + resource.getFileName()));
 			}
 		}
+	}
+	public void uploadSubmitFileToResourceServer(String fileName, byte[] data) throws Exception{
+		GroupResource groupResource  = new GroupResource();
+		MyResource submitFile = new MyResource();
+		submitFile.setFileName(fileName);
+		submitFile.setData(data);
+		submitFile.setResourceType(MyResource.RESOURCE_TYPE_SUBMIT);
+		groupResource.add(submitFile);
+		
+		MyResponse myResponse = resourceClient.upfile(groupResource);
+		if(myResponse.getCode() != MyResponse.CODE_SUCCESS)
+			throw new Exception("Can't connect to resource server!");
 	}
 }
